@@ -1,0 +1,8 @@
+{
+    "name": "weather-forecast",
+    "version": "0.0.1",
+    "dependencies": [
+    "cpr",
+    "qtbase"
+    ]
+}
