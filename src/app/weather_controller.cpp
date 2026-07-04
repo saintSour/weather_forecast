@@ -30,4 +30,11 @@ void WeatherController::refresh()
         emit fetchFailed(data.errorMessage);
 }
 
+void WeatherController::changeCity(const QString& newCity)
+{
+    config_.city = newCity;
+    start();
+}
+
+
 } // namespace weather

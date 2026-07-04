@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
     QApplication app(argc, argv);
 
     weather::AppConfig config;
-    config.city = QStringLiteral("Moscow");
+    config.city = QStringLiteral("Москва");
 
     auto* widget = new weather::WeatherWidget();
     widget->resize(config.windowSize);
@@ -22,8 +22,8 @@ int main(int argc, char* argv[])
 
     QObject::connect(controller, &weather::WeatherController::weatherUpdated, widget, &weather::WeatherWidget::showWeather);
     QObject::connect(controller, &weather::WeatherController::fetchFailed, widget, &weather::WeatherWidget::showError);
-
+    QObject::connect(widget, &weather::WeatherWidget::cityChanged, controller, &weather::WeatherController::changeCity);
     controller->start();
-
+    
     return app.exec();
 }

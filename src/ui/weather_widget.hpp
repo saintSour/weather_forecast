@@ -22,6 +22,9 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
 
+signals:
+    void cityChanged(const QString& newCity);
+
 private:
     void updateDetails(const WeatherData& data);
 

@@ -3,6 +3,9 @@
 #include <QFrame>
 #include <QMouseEvent>
 #include <QVBoxLayout>
+#include <QPushButton>
+#include <QSpacerItem>
+#include <QComboBox>
 
 namespace weather {
 
@@ -25,6 +28,64 @@ WeatherWidget::WeatherWidget(QWidget* parent)
     descriptionLabel_->setStyleSheet("color: rgba(255,255,255,230); font-size: 14px;");
     detailsLabel_->setStyleSheet("color: rgba(255,255,255,180); font-size: 12px;");
 
+    // 1. Создаем выпадающее меню (QComboBox) для выбора городов
+    QComboBox* cityComboBox = new QComboBox(this);
+    cityComboBox->addItems({ "Москва", "Санкт-Петербург", "Новосибирск", "Екатеринбург" });
+    cityComboBox->setFixedWidth(130); // Задаем оптимальную ширину
+    
+    // Стилизуем меню под дизайн вашей темной полупрозрачной карточки
+    cityComboBox->setStyleSheet(
+        "QComboBox {"
+        "   background: rgba(255, 255, 255, 20);" // Полупрозрачный фон
+        "   color: white;"
+        "   border: 1px solid rgba(255, 255, 255, 40);"
+        "   border-radius: 6px;"
+        "   padding: 2px 25px 2px 8px;"
+        "   font-size: 12px;"
+        "}"
+        "QComboBox:hover {"
+        "   background: rgba(255, 255, 255, 35);"
+        "}"
+        "QComboBox::drop-down {"
+        "   subcontrol-origin: padding;"
+        "   subcontrol-position: top right;"
+        "   width: 20px;"
+        "   border-left: none;"
+        "}"
+        "QComboBox QAbstractItemView {" // Стилизация выпадающего списка
+        "   background-color: #141820;"
+        "   color: white;"
+        "   selection-background-color: #ff4d4d;" // Выделение в цвет кнопки
+        "   border: 1px solid rgba(255, 255, 255, 40);"
+        "   border-radius: 6px;"
+        "}"
+    );
+
+    connect(cityComboBox, &QComboBox::currentTextChanged, this, &WeatherWidget::cityChanged);
+
+    QPushButton* closeButton = new QPushButton(this);
+    closeButton->setFixedSize(24, 24);
+    closeButton->setStyleSheet(
+            "QPushButton {"
+            "   background-color: #ff4d4d;" // Красный цвет
+            "   color: white;"              // Белый текст/крестик
+            "   border: none;"              // Без рамки
+            "   border-radius: 12px;"       // Скругление (12px = половина размера, выйдет круг)
+            "   font-weight: bold;"
+            "}"
+            "QPushButton:hover {"
+            "   background-color: #ff3333;" // Темнеет при наведении
+            "}"
+    );
+    connect(closeButton, &QPushButton::clicked, this, &QWidget::close);
+    
+    QHBoxLayout *topLayout = new QHBoxLayout();
+    topLayout->setContentsMargins(0, 0, 0, 0);
+    topLayout->addWidget(cityComboBox);
+    topLayout->addStretch();
+    topLayout->addWidget(closeButton);
+
+    // 3. Создаем карточку-фон
     auto* card = new QFrame(this);
     card->setObjectName("weatherCard");
     card->setStyleSheet(
@@ -36,6 +97,8 @@ WeatherWidget::WeatherWidget(QWidget* parent)
     auto* cardLayout = new QVBoxLayout(card);
     cardLayout->setContentsMargins(14, 14, 14, 14);
     cardLayout->setSpacing(6);
+    
+    cardLayout->addLayout(topLayout);
     cardLayout->addWidget(animationWidget_);
     cardLayout->addWidget(cityLabel_);
     cardLayout->addWidget(temperatureLabel_);

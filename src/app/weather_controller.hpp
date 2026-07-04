@@ -21,6 +21,7 @@ public:
 
     void start();
     void refresh();
+    void changeCity(const QString& newCity);
 
 signals:
     void weatherUpdated(const weather::WeatherData& data);
