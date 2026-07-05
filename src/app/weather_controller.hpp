@@ -1,36 +1,34 @@
 #pragma once
 
-#include "../core/iweather_provider.hpp"
-#include "../core/weather_data.hpp"
-#include "app_config.hpp"
-
 #include <QObject>
 #include <QTimer>
 #include <memory>
 
+#include "../core/iweather_provider.hpp"
+#include "../core/weather_data.hpp"
+#include "app_config.hpp"
+
 namespace weather {
 
 class WeatherController final : public QObject {
-    Q_OBJECT
+  Q_OBJECT
 
-public:
-    explicit WeatherController(
-        std::unique_ptr<IWeatherProvider> provider,
-        AppConfig config,
-        QObject* parent = nullptr);
+ public:
+  explicit WeatherController(std::unique_ptr<IWeatherProvider> provider,
+                             AppConfig config, QObject *parent = nullptr);
 
-    void start();
-    void refresh();
-    void changeCity(const QString& newCity);
+  void start();
+  void refresh();
+  void changeCity(const QString &newCity);
 
-signals:
-    void weatherUpdated(const weather::WeatherData& data);
-    void fetchFailed(const QString& message);
+ signals:
+  void weatherUpdated(const weather::WeatherData &data);
+  void fetchFailed(const QString &message);
 
-private:
-    std::unique_ptr<IWeatherProvider> provider_;
-    AppConfig config_;
-    QTimer refreshTimer_;
+ private:
+  std::unique_ptr<IWeatherProvider> provider_;
+  AppConfig config_;
+  QTimer refreshTimer_;
 };
 
-} // namespace weather
+}  // namespace weather

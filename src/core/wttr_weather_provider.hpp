@@ -5,8 +5,8 @@
 namespace weather {
 
 class WttrWeatherProvider final : public IWeatherProvider {
-public:
-    WeatherData fetch(const QString& city) override;
+ public:
+  WeatherData fetch(const QString &city) override;
 };
 
-} // namespace weather
+}  // namespace weather
