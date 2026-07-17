@@ -1,4 +1,5 @@
 #include "weather_widget.hpp"
+#include "city_input_dialog.hpp"
 
 #include <QComboBox>
 #include <QFrame>
@@ -32,18 +33,8 @@ WeatherWidget::WeatherWidget(QWidget *parent) : QWidget(parent) {
   detailsLabel_->setStyleSheet(
       "color: rgba(255,255,255,180); font-size: 12px;");
 
-  // 1. Создаем выпадающее меню (QComboBox) для выбора городов
   QComboBox *cityComboBox = new QComboBox(this);
-
-  QSettings settings("saintSour", "weather_widget");
-  QStringList savedCities = settings.value("cities").toStringList();
-
-  if (savedCities.isEmpty()) {
-    cityComboBox->addItems(
-      {"Москва", "Санкт-Петербург", "Новосибирск", "Екатеринбург"});
-  } else {
-    cityComboBox->addItems(savedCities);
-  }
+  cityComboBox->addItems(cityManager_.loadCities());
 
   cityComboBox->addItem("+ Добавить город...", QString("ADD_NEW_CITY"));
   cityComboBox->setFixedWidth(130);
@@ -55,21 +46,10 @@ WeatherWidget::WeatherWidget(QWidget *parent) : QWidget(parent) {
             if (cityData == "ADD_NEW_CITY") {
               bool ok;
 
-              QInputDialog dialog(this);
-              dialog.setWindowTitle("Добавление города");
-              dialog.setLabelText("Введите название города:");
-              dialog.setInputMode(QInputDialog::TextInput);
-
-              dialog.setStyleSheet(
-                "QInputDialog { background-color: #141820; border-radius: 12px; }"
-                "QLabel { color: rgba(255, 255, 255, 230); font-size: 13px; }"
-                "QLineEdit { background: rgba(255, 255, 255, 20); color: white; border: 1px solid rgba(255, 255, 255, 40); border-radius: 6px; padding: 6px; font-size: 13px; }"
-                "QPushButton { background-color: rgba(255, 77, 77, 200); color: white; border: none; border-radius: 6px; padding: 6px 14px; font-weight: bold; }"
-                "QPushButton:hover { background-color: #ff3333; }"
-              );
+              CityInputDialog dialog(this);
 
               if (dialog.exec() == QDialog::Accepted) {
-                QString cityName = dialog.textValue().trimmed();
+                QString cityName = dialog.getTrimmedCity();
                 if (!cityName.isEmpty()) {
                   int insertIndex = cityComboBox->count() - 1;
 
@@ -82,9 +62,8 @@ WeatherWidget::WeatherWidget(QWidget *parent) : QWidget(parent) {
                   for (int i = 0; i < cityComboBox->count() - 1; ++i) {
                     updatedCities << cityComboBox->itemText(i);
                   }
+                  cityManager_.saveCities(updatedCities);
 
-                  QSettings settings("saintSour", "weather_widget");
-                  settings.setValue("cities", updatedCities);
                   emit cityChanged(cityName);
                   return;
                 }

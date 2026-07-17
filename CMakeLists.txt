@@ -16,8 +16,10 @@ set(WEATHER_SOURCES
     src/main.cpp
     src/core/wttr_weather_provider.cpp
     src/app/weather_controller.cpp
+    src/app/city_manager.cpp
     src/ui/weather_animation_widget.cpp
     src/ui/weather_widget.cpp
+    src/ui/city_input_dialog.cpp
 )
 
 add_executable(weather_forecast ${WEATHER_SOURCES})

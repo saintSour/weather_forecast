@@ -6,6 +6,7 @@
 
 #include "../core/weather_data.hpp"
 #include "weather_animation_widget.hpp"
+#include "../app/city_manager.hpp"
 
 namespace weather {
 
@@ -29,6 +30,8 @@ class WeatherWidget final : public QWidget {
   void updateDetails(const WeatherData &data);
 
   WeatherAnimationWidget *animationWidget_ = nullptr;
+  CityManager cityManager_;
+
   QLabel *cityLabel_ = nullptr;
   QLabel *temperatureLabel_ = nullptr;
   QLabel *descriptionLabel_ = nullptr;
