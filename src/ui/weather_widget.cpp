@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QSpacerItem>
 #include <QVBoxLayout>
+#include <QSettings>
 
 namespace weather {
 
@@ -33,8 +34,17 @@ WeatherWidget::WeatherWidget(QWidget *parent) : QWidget(parent) {
 
   // 1. Создаем выпадающее меню (QComboBox) для выбора городов
   QComboBox *cityComboBox = new QComboBox(this);
-  cityComboBox->addItems(
+
+  QSettings settings("saintSour", "weather_widget");
+  QStringList savedCities = settings.value("cities").toStringList();
+
+  if (savedCities.isEmpty()) {
+    cityComboBox->addItems(
       {"Москва", "Санкт-Петербург", "Новосибирск", "Екатеринбург"});
+  } else {
+    cityComboBox->addItems(savedCities);
+  }
+
   cityComboBox->addItem("+ Добавить город...", QString("ADD_NEW_CITY"));
   cityComboBox->setFixedWidth(130);
 
@@ -50,48 +60,32 @@ WeatherWidget::WeatherWidget(QWidget *parent) : QWidget(parent) {
               dialog.setLabelText("Введите название города:");
               dialog.setInputMode(QInputDialog::TextInput);
 
-              // QString cityName = QInputDialog::getText(
-              //     this,
-              //     "Добавление города",
-              //     "Введите название города:",
-              //     QLineEdit::Normal,
-              //     "",
-              //     &ok
-              // );
-
               dialog.setStyleSheet(
-                  "QInputDialog {"
-                  "   background-color: #141820;"
-                  "}"
-                  "QLabel {"
-                  "   color: rgba(255, 255, 255, 230);"
-                  "   font-size: 13px;"
-                  "}"
-                  "QLineEdit {"
-                  "   background: rgba(255, 255, 255, 20);"
-                  "   color: white;"
-                  "   border: 1px solid rgba(255, 255, 255, 40);"
-                  "   border-radius: 6px;"
-                  "   padding: 6px;"
-                  "   font-size: 13px;"
-                  "}"
-                  "QPushButton {"
-                  "   background-color: rgba(255, 77, 77, 200);"
-                  "   color: white;"
-                  "   border: none;"
-                  "   border-radius: 6px;"
-                  "   padding: 6px 14px;"
-                  "   font-weight: bold;"
-                  "}"
-                  "QPushButton:hover {"
-                  "   background-color: #ff3333;"
-                  "}");
+                "QInputDialog { background-color: #141820; border-radius: 12px; }"
+                "QLabel { color: rgba(255, 255, 255, 230); font-size: 13px; }"
+                "QLineEdit { background: rgba(255, 255, 255, 20); color: white; border: 1px solid rgba(255, 255, 255, 40); border-radius: 6px; padding: 6px; font-size: 13px; }"
+                "QPushButton { background-color: rgba(255, 77, 77, 200); color: white; border: none; border-radius: 6px; padding: 6px 14px; font-weight: bold; }"
+                "QPushButton:hover { background-color: #ff3333; }"
+              );
 
               if (dialog.exec() == QDialog::Accepted) {
                 QString cityName = dialog.textValue().trimmed();
                 if (!cityName.isEmpty()) {
                   int insertIndex = cityComboBox->count() - 1;
+
+                  cityComboBox->blockSignals(true);
                   cityComboBox->insertItem(insertIndex, cityName, cityName);
+                  cityComboBox->setCurrentIndex(insertIndex);
+                  cityComboBox->blockSignals(false);
+
+                  QStringList updatedCities;
+                  for (int i = 0; i < cityComboBox->count() - 1; ++i) {
+                    updatedCities << cityComboBox->itemText(i);
+                  }
+
+                  QSettings settings("saintSour", "weather_widget");
+                  settings.setValue("cities", updatedCities);
+                  emit cityChanged(cityName);
                   return;
                 }
               }
@@ -101,7 +95,8 @@ WeatherWidget::WeatherWidget(QWidget *parent) : QWidget(parent) {
               cityComboBox->blockSignals(false);
               emit cityChanged(cityComboBox->itemData(0).toString());
             } else {
-              emit cityChanged(cityData);
+              QString currentCity = cityData.isEmpty() ? cityComboBox->itemText(index) : cityData;
+              emit cityChanged(currentCity);
             }
           });
 
